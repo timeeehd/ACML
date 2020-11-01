@@ -107,56 +107,67 @@ def backpropagation(input, W1, W2, b1, b2):
 
     return pd_W.transpose(), pd_B, pd_W_H, pd_B_H
 
-backpropagation([1,0,0,0,0,0,0,0], weights_l1_l2, weights_l2_l3, b_l1, b_l2)
+# backpropagation([1,0,0,0,0,0,0,0], weights_l1_l2, weights_l2_l3, b_l1, b_l2)
 
-# def update_parameters(input, W1, W2, b1, b2):
-#     d_W = numpy.array([0 for i in range(24)]).reshape(3, 8)
-#     d_B = numpy.array([0 for i in range(8)]).reshape(1, 8)
-#     d_W_H = numpy.array([0 for i in range(24)]).reshape(8, 3)
-#     d_B_H = numpy.array([0 for i in range(3)]).reshape(1, 3)
-#
-#     for i in input:
-#         pd_W, pd_B, pd_W_H, pd_B_H = backpropagation(i, W1, W2, b1, b2)
-#
-#         d_W = d_W + numpy.array(pd_W)
-#         d_B = d_B + numpy.array(pd_B)
-#         d_W_H = d_W_H + numpy.array(pd_W_H)
-#         d_B_H = d_B_H + numpy.array(pd_B_H)
-#
-#     W1 = W1 - learning_rate * ((1 / len(input)) * d_W_H + lambda_value * numpy.array(W1))
-#     W2 = W2 - learning_rate * ((1 / len(input)) * d_W + lambda_value * numpy.array(W2))
-#     b1 = numpy.array(b1) - learning_rate * ((1 / len(input)) * numpy.array(d_B_H[0]).transpose())
-#     b2 = numpy.array(b2) - learning_rate * ((1 / len(input)) * numpy.array(d_B[0]).transpose())
-#
-#     return W1, W2, b1, b2
-#
-#
-# def gradient_descent(input, W1, W2, b1, b2):
-#     count = 0
-#     correct_count = 0
-#     # training
-#     while (correct_count != len(input)):
-#         count = count + 1
-#         correct_count = 0
-#         # The number of inputs to be learned on can be changed here by adapting input[:8] for example:
-#         # first 3 and last 2: input[:3]+ input[6:8]
-#         W1, W2, b1, b2 = update_parameters(input[0:8], W1, W2, b1, b2)
-#         for i in input:
-#             o, h = feedforward(i, W1, W2, b1, b2)
-#             if i.index(max(i)) == o.index(max(o)):
-#                 correct_count = correct_count + 1
-#         if (count % 10000 == 0):
-#             print(count)
-#             for i in input:
-#                 o, h = feedforward(i, W1, W2, b1, b2)
-#                 print("Expected - ", i.index(max(i)), " Actual - ", o.index(max(o)))
-#     print("Convergence reached after", count, "iterations for a Learning rate of", learning_rate, "and a Lambda of",
-#           lambda_value)
-#     for i in input:
-#         o, h = feedforward(i, W1, W2, b1, b2)
-#         output = [0 for i in range(8)]
-#         output[o.index(max(o))] = 1
-#         print("input", i, "  output", output)
+def update_parameters(input, W1, W2, b1, b2):
+    d_W = numpy.array([0 for i in range(24)]).reshape(3, 8)
+    d_B = numpy.array([0 for i in range(8)]).reshape(1, 8)
+    d_W_H = numpy.array([0 for i in range(24)]).reshape(8, 3)
+    d_B_H = numpy.array([0 for i in range(3)]).reshape(1, 3)
+
+
+
+    for i in input:
+        pd_W, pd_B, pd_W_H, pd_B_H = backpropagation(i, W1, W2, b1, b2)
+        # print(pd_W)
+        d_W = d_W + numpy.array(pd_W)
+        d_B = d_B + numpy.array(pd_B)
+        d_W_H = d_W_H + numpy.array(pd_W_H)
+        d_B_H = d_B_H + numpy.array(pd_B_H)
+    # print(f'dw {d_W} ')
+    W1 = W1 - learning_rate * ((1 / len(input)) * d_W_H + lambda_value * numpy.array(W1))
+    W2 = W2 - learning_rate * ((1 / len(input)) * d_W + lambda_value * numpy.array(W2))
+    b1 = numpy.array(b1) - learning_rate * ((1 / len(input)) * numpy.array(d_B_H[0]).transpose())
+    b2 = numpy.array(b2) - learning_rate * ((1 / len(input)) * numpy.array(d_B[0]).transpose())
+
+    # print(f'b2 {b2}')
+    # print(f'b1 {b1}')
+    # print(f'w1 {W1}')
+    # print(f'w2 {W2}')
+
+    return W1, W2, b1, b2
+
+update_parameters([[1,0,0,0,0,0,0,0]], weights_l1_l2, weights_l2_l3, b_l1, b_l2)
+
 #
 #
-# gradient_descent(inputs, weights_l1_l2, weights_l2_l3, b_l1, b_l2)
+def gradient_descent(input, W1, W2, b1, b2):
+    count = 0
+    correct_count = 0
+    # training
+    # while (correct_count != len(input)):
+    while(count < 10000):
+        count = count + 1
+        correct_count = 0
+        # The number of inputs to be learned on can be changed here by adapting input[:8] for example:
+        # first 3 and last 2: input[:3]+ input[6:8]
+        W1, W2, b1, b2 = update_parameters(input[0:8], W1, W2, b1, b2)
+        for i in input:
+            o, h = feedforward(i, W1, W2, b1, b2)
+            if i.index(max(i)) == o.index(max(o)):
+                correct_count = correct_count + 1
+        if (count % 10000 == 0):
+            print(count)
+            for i in input:
+                o, h = feedforward(i, W1, W2, b1, b2)
+                print("Expected - ", i.index(max(i)), " Actual - ", o.index(max(o)))
+    print("Convergence reached after", count, "iterations for a Learning rate of", learning_rate, "and a Lambda of",
+          lambda_value)
+    for i in input:
+        o, h = feedforward(i, W1, W2, b1, b2)
+        output = [0 for i in range(8)]
+        output[o.index(max(o))] = 1
+        print("input", i, "  output", o, " output2",  output)
+
+
+gradient_descent(inputs, weights_l1_l2, weights_l2_l3, b_l1, b_l2)
